@@ -24,6 +24,41 @@ function balance(api_key, next) {
                   });
 }
 
+function send_btc(api_key, email, amount, note, next) {
+    var url = base_url + 'transactions/send_money?api_key=' + api_key;
+    var o_body = {
+        transaction : {
+            to : email,
+            amount : amount,
+            note : note
+        }
+    };
+    return HotTap(url).request("POST", 
+                               {"Content-Type" : "application/json"},
+                               JSON.stringify(o_body),
+                               function(err, response) {
+                                   if ( err ) { return next(err); };
+                                   if ( response.status != 200 ) {
+                                       return next('invalid status ' + response.status + ' received');
+                                   } else {
+                                       var json = JSON.parse(response.body);
+                                       if ( _.isUndefined(json.success) ) {
+                                           return next('invalid response received (no success)');
+                                       } else {
+                                           if ( ! json.success ) {
+                                               return next(JSON.stringify(json.errors));
+                                           } else {
+                                               if ( _.isUndefined(json.transaction.id) ) {
+                                                   return next('invalid response received (no transaction id)');
+                                               }
+                                               return next(null, json.transaction.id);
+                                           }
+                                       }
+                                   }
+                               });
+}
+
 module.exports = {
-    balance:balance
+    balance:balance,
+    send_btc:send_btc
 }
