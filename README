@@ -1,0 +1,9 @@
+Simple nodejs client for interacting with portions of the Coinbase API.
+
+Currently only supports API Key based access.
+
+Highly Alpha.
+
+Use at your own risk.
+
+Do not operate while using heavy machinery.
