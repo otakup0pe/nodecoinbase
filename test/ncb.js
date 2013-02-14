@@ -10,39 +10,60 @@ describe('balance', function() {
                         .get('/api/v1/account/balance?api_key=XXX')
                         .reply(200, {currency:'BTC', amount:42});
                     return ncb.balance('foo', function(err, balance) {
-                                    if ( err ) { throw err; }
-                                    assert(balance == 42);
-                                    done();
-                                });
-                    });
-});
+                                           if ( err ) { throw err; }
+                                           assert(balance == 42);
+                                           done();
+                                       });
+                });
+             it('should throw 401 on bad key', function(done) {
+                    var scope = nock('https://coinbase.com')
+                        .filteringPath(/api_key=[^&]*/g, 'api_key=XXX')
+                        .get('/api/v1/account/balance?api_key=XXX')
+                        .reply(401);
+                    return ncb.balance('foo', function(err, balance) {
+                                           assert(err == 'invalid status 401 received');
+                                           done();
+                                       });
+                });
+         });
 
 describe('send_btc', function() {
-         it('should return a transaction id', function(done) {
-                var scope = nock('https://coinbase.com')
-                    .filteringPath(/api_key=[^&]*/g, 'api_key=XXX')
-                    .post('/api/v1/transactions/send_money?api_key=XXX', 
-                          {
-                              transaction :
+             it('should return a transaction id', function(done) {
+                    var scope = nock('https://coinbase.com')
+                        .filteringPath(/api_key=[^&]*/g, 'api_key=XXX')
+                        .post('/api/v1/transactions/send_money?api_key=XXX',
                               {
-                                  to: 'foo@bar.com',
-                                  amount: 42,
-                                  note: 'doin thangs'
-                              }
-                          })
-                    .reply(200, 
-                           {
-                               success:true,
-                               transaction :
+                                  transaction :
+                                  {
+                                      to: 'foo@bar.com',
+                                      amount: 42,
+                                      note: 'doin thangs'
+                                  }
+                              })
+                        .reply(200,
                                {
-                                   id: "42"
-                               }
-                           });
-                return ncb.send_btc('foo', 'foo@bar.com', 42, 'doin thangs', function(err, id) {
-                                        if ( err ) { throw err; }
-                                        assert(id == '42');
-                                        done();
-                                    });
-            });
+                                   success:true,
+                                   transaction :
+                                   {
+                                       id: "42"
+                                   }
+                               });
+                    return ncb.send_btc('foo', 'foo@bar.com', 42, 'doin thangs', function(err, id) {
+                                            if ( err ) { throw err; }
+                                            assert(id == '42');
+                                            done();
+                                        });
+                });
+             it('should throw 401 on bad key', function(done) {
+                    var scope = nock('https://coinbase.com')
+                        .filteringPath(/api_key=[^&]*/g, 'api_key=XXX')
+                        .get('/api/v1/account/balance?api_key=XXX')
+                        .reply(401);
+                    return ncb.balance('foo', function(err, balance) {
+                                           assert(err == 'invalid status 401 received');
+                                           done();
+                                       });
+                });
 
-});
+
+         });
