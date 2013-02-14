@@ -1,0 +1,15 @@
+{
+      "name": "nodecoinbase",
+      "description" : "NodeJS client library for coinbase",
+      "keywords" : [],
+      "version": "0.0.1",
+      "dependencies": {
+                      "hottap" : "",
+                      "underscore" : ""
+      },
+      "devDependencies" : {
+                        "mocha" : "",
+                        "should" : "",
+                        "nock" : ""
+      }
+}
